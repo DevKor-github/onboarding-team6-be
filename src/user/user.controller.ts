@@ -57,7 +57,9 @@ export class UserController {
     @Body() changePictureDto: ChangePictureDto,
     @Req() request,
   ): Promise<ChangePictureDto> {
-    return this.userService.updatePicture(request.user.id, changePictureDto);
+    const userId = request.user.userId;
+    console.log('Updating picture for user with ID:', userId);
+    return this.userService.updatePicture(userId, changePictureDto);
   }
 
   @Put('me')
@@ -68,7 +70,9 @@ export class UserController {
     @Body() changeOtherDto: ChangeOtherDto,
     @Req() request,
   ): Promise<ChangeOtherDto> {
-    return this.userService.update(request.user.id, changeOtherDto);
+    const userId = request.user.userId;
+    console.log('Updating user with ID:', userId);
+    return this.userService.update(userId, changeOtherDto);
   }
 
   @Delete('me')
@@ -76,6 +80,8 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @ApiOkResponse({ type: CreateUserDto })
   async delete(@Req() request): Promise<CreateUserDto> {
-    return this.userService.delete(request.user.id);
+    const userId = request.user.userId;
+    console.log('Deleting user with ID:', userId);
+    return this.userService.delete(userId);
   }
 }
