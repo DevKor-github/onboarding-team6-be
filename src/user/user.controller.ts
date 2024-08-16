@@ -27,8 +27,26 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOkResponse({ type: UserDto })
+  // async getUser(@Req() request): Promise<UserDto> {
+  //   console.log('Decoded user info:', request.user);
+  //   return this.userService.getUser(request.user.id);
+  // }
+  // async getUser(@Req() request): Promise<UserDto> {
+  //   const { id, sub } = request.user;
+  //   console.log('Decoded user info:', request.user); // 디버깅용
+  //   return this.userService.getUser(id, sub);
+  // }
+  // async getUser(@Req() request): Promise<UserDto> {
+  //   // request.user.userId에서 id를 가져옵니다.
+  //   const userId = request.user.userId || request.user.sub;
+  //   console.log('Decoded user info:', request.user); // 디버깅용
+  //   return this.userService.getUser(userId, userId);
+  // }
   async getUser(@Req() request): Promise<UserDto> {
-    return this.userService.getUser(request.user.id);
+    // userId를 sub에서 가져옵니다.
+    const userId = request.user.userId;
+    console.log('Decoded user info:', request.user); // 디버깅용 로그
+    return this.userService.getUser(userId);
   }
 
   @Put('me/picture')

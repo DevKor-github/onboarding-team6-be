@@ -32,20 +32,85 @@ export class UserService {
     return await this.userModel.findOne({ username }).exec();
   }
 
+  // async getUser(id: string): Promise<UserDto> {
+  //   let userId: Types.ObjectId;
+
+  //   try {
+  //     userId = new Types.ObjectId(id);
+  //   } catch (error) {
+  //     throw new NotFoundException('Invalid user ID');
+  //   }
+  //   console.log('Looking for user with ID:', id);
+  //   const user = await this.userModel.findById(userId).exec();
+
+  //   if (!user) {
+  //     console.log('User not found for ID:', id);
+  //     throw new NotFoundException('User not found');
+  //   }
+  //   const { username, profilePicture, bio } = user.toObject();
+  //   return { username, profilePicture, bio } as UserDto;
+  // }
+  // async getUser(
+  //   id: string | undefined,
+  //   sub: string | undefined,
+  // ): Promise<UserDto> {
+  //   // 우선 id가 있으면 id를 사용, 없으면 sub를 사용
+  //   const userIdString = id || sub;
+
+  //   if (!userIdString) {
+  //     throw new NotFoundException('User ID or sub not provided');
+  //   }
+
+  //   let userId: Types.ObjectId;
+
+  //   try {
+  //     userId = new Types.ObjectId(userIdString);
+  //   } catch (error) {
+  //     throw new NotFoundException('Invalid user ID');
+  //   }
+
+  //   console.log('Looking for user with ID:', userId);
+  //   const user = await this.userModel.findById(userId).exec();
+
+  //   if (!user) {
+  //     console.log('User not found for ID:', userId);
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   const { username, profilePicture, bio } = user.toObject();
+  //   return { username, profilePicture, bio } as UserDto;
+  // }
+  // async getUser(id: string): Promise<UserDto> {
+  //   let userId: Types.ObjectId;
+
+  //   try {
+  //     userId = new Types.ObjectId(id);
+  //   } catch (error) {
+  //     throw new NotFoundException('Invalid user ID');
+  //   }
+
+  //   console.log('Looking for user with ID:', userId);
+  //   const user = await this.userModel.findById(userId).exec();
+
+  //   if (!user) {
+  //     console.log('User not found for ID:', userId);
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   const { username, profilePicture, bio } = user.toObject();
+  //   return { username, profilePicture, bio } as UserDto;
+  // }
   async getUser(id: string): Promise<UserDto> {
-    let userId: Types.ObjectId;
+    console.log('Looking for user with ID:', id);
 
-    try {
-      userId = new Types.ObjectId(id);
-    } catch (error) {
-      throw new NotFoundException('Invalid user ID');
-    }
-
-    const user = await this.userModel.findById(userId).exec();
+    // 이 시점에서 id는 MongoDB의 _id와 동일한 문자열이어야 합니다.
+    const user = await this.userModel.findById(id).exec();
 
     if (!user) {
+      console.log('User not found for ID:', id);
       throw new NotFoundException('User not found');
     }
+
     const { username, profilePicture, bio } = user.toObject();
     return { username, profilePicture, bio } as UserDto;
   }
