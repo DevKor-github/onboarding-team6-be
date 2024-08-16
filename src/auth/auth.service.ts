@@ -17,7 +17,7 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword,
     });
-    return this.generateToken(newUser);
+    return this.generateTokenWithUserInfo(newUser);
   }
 
   async login(username: string, password: string) {
@@ -25,17 +25,34 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new Error('Invalid credentials');
     }
-    return this.generateToken(user);
+    return this.generateTokenWithUserInfo(user);
   }
 
-  private generateToken(user: any) {
+  // private generateToken(user: any) {
+  //   const payload = { username: user.username, sub: user._id };
+  //   const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+  //   const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' }); // 리프레시 토큰은 보통 더 긴 유효기간을 가집니다
+
+  //   return {
+  //     access_token: accessToken,
+  //     refresh_token: refreshToken,
+  //   };
+  // }
+
+  private generateTokenWithUserInfo(user: any) {
     const payload = { username: user.username, sub: user._id };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' }); // 리프레시 토큰은 보통 더 긴 유효기간을 가집니다
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        bio: user.bio,
+        profilePicture: user.profilePicture,
+      },
     };
   }
 
@@ -46,7 +63,7 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
-      return this.generateToken(user);
+      return this.generateTokenWithUserInfo(user);
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
