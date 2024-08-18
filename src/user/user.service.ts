@@ -28,8 +28,14 @@ export class UserService {
     return await newUser.save();
   }
 
+  //유저네임은 수정될 수 있어서 이름으로 검색 안하고
   async findByUsername(username: string): Promise<User | null> {
     return await this.userModel.findOne({ username }).exec();
+  }
+
+  //주로 이렇게 ID로만 검색할듯
+  async findById(id: string): Promise<User | null> {
+    return this.userModel.findById(id).exec();
   }
 
   // async getUser(id: string): Promise<UserDto> {

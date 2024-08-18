@@ -58,13 +58,18 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     try {
+      console.log('Received refresh token:', refreshToken);
       const decoded = this.jwtService.verify(refreshToken);
-      const user = await this.userService.findByUsername(decoded.username);
+      console.log('Decoded refresh token payload:', decoded);
+
+      const user = await this.userService.findById(decoded.sub); // 여기서 sub (user.id)로 사용자 조회
       if (!user) {
+        console.error('User not found for ID:', decoded.sub);
         throw new UnauthorizedException('User not found');
       }
       return this.generateTokenWithUserInfo(user);
     } catch (error) {
+      console.error('Refresh token validation error:', error);
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
