@@ -10,7 +10,13 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import {
   UserDto,
   CreateUserDto,
@@ -23,25 +29,13 @@ import {
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiOperation({ summary: '내정보 요청 - 이름, 프로필사진, 한줄소개' })
+  @ApiResponse({ status: 201, description: '성공' })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
   @Get('me')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOkResponse({ type: UserDto })
-  // async getUser(@Req() request): Promise<UserDto> {
-  //   console.log('Decoded user info:', request.user);
-  //   return this.userService.getUser(request.user.id);
-  // }
-  // async getUser(@Req() request): Promise<UserDto> {
-  //   const { id, sub } = request.user;
-  //   console.log('Decoded user info:', request.user); // 디버깅용
-  //   return this.userService.getUser(id, sub);
-  // }
-  // async getUser(@Req() request): Promise<UserDto> {
-  //   // request.user.userId에서 id를 가져옵니다.
-  //   const userId = request.user.userId || request.user.sub;
-  //   console.log('Decoded user info:', request.user); // 디버깅용
-  //   return this.userService.getUser(userId, userId);
-  // }
   async getUser(@Req() request): Promise<UserDto> {
     // userId를 sub에서 가져옵니다.
     const userId = request.user.userId;
@@ -49,6 +43,9 @@ export class UserController {
     return this.userService.getUser(userId);
   }
 
+  @ApiOperation({ summary: '내정보 수정 - 프로필사진만 수정' })
+  @ApiResponse({ status: 201, description: '성공' })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
   @Put('me/picture')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -62,6 +59,9 @@ export class UserController {
     return this.userService.updatePicture(userId, changePictureDto);
   }
 
+  @ApiOperation({ summary: '내정보 수정 - 이름, 비번, 한줄소개 수정' })
+  @ApiResponse({ status: 201, description: '성공' })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
   @Put('me')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -75,6 +75,9 @@ export class UserController {
     return this.userService.update(userId, changeOtherDto);
   }
 
+  @ApiOperation({ summary: '탈퇴시 유저 삭제' })
+  @ApiResponse({ status: 201, description: '성공' })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
   @Delete('me')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
