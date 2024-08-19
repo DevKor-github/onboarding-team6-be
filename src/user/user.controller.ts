@@ -7,6 +7,7 @@ import {
   Req,
   UseGuards,
   NotFoundException,
+  Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -86,5 +87,17 @@ export class UserController {
     const userId = request.user.userId;
     console.log('Deleting user with ID:', userId);
     return this.userService.delete(userId);
+  }
+
+  @ApiOperation({ summary: '다른 사용자의 정보 조회' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '사용자를 찾을 수 없음' })
+  @Get(':username')
+  @ApiOkResponse({ type: UserDto })
+  async getUserByUsername(
+    @Param('username') username: string,
+  ): Promise<UserDto> {
+    console.log('Fetching user info for username:', username);
+    return this.userService.getUserByUsername(username);
   }
 }

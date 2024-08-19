@@ -28,7 +28,7 @@ export class UserService {
     return await newUser.save();
   }
 
-  //유저네임은 수정될 수 있어서 이름으로 검색 안하고
+  //유저네임은 수정될 수 있어서
   async findByUsername(username: string): Promise<User | null> {
     return await this.userModel.findOne({ username }).exec();
   }
@@ -38,6 +38,7 @@ export class UserService {
     return this.userModel.findById(id).exec();
   }
 
+  //1. 내정보 조회
   async getUser(id: string): Promise<UserDto> {
     console.log('Looking for user with ID:', id);
 
@@ -51,6 +52,18 @@ export class UserService {
 
     const { username, profilePicture, bio } = user.toObject();
     return { username, profilePicture, bio } as UserDto;
+  }
+
+  //2. 남의 정보 유저네임으로 조회
+  async getUserByUsername(username: string): Promise<UserDto> {
+    const user = await this.userModel.findOne({ username }).exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with username ${username} not found`);
+    }
+
+    const { username: foundUsername, profilePicture, bio } = user.toObject();
+    return { username: foundUsername, profilePicture, bio } as UserDto;
   }
 
   async updatePicture(
