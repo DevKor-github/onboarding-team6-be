@@ -5,7 +5,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { RoomModule } from './room/room.module';
 // import { MoneyModule } from './money/money.module';
-// import { ChatModule } from './chat/chat.module';
+import { ChatModule } from './chat/chat.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -16,7 +16,7 @@ import { ConfigModule } from '@nestjs/config';
     UserModule,
     RoomModule,
     // MoneyModule,
-    // ChatModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

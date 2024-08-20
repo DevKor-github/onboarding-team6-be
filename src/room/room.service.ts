@@ -9,7 +9,11 @@ export class RoomService {
   constructor(@InjectModel('Room') private readonly roomModel: Model<Room>) {}
 
   async create(createRoomDto: CreateRoomDto): Promise<Room> {
-    const newRoom = new this.roomModel(createRoomDto);
+    const newRoom = new this.roomModel({
+      ...createRoomDto,
+      members: [createRoomDto.ownerId], // 방장을 멤버로 추가
+      memberCount: 1, // 멤버 수 초기화
+    });
     return await newRoom.save();
   }
 

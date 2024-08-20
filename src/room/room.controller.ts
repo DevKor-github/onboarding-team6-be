@@ -6,6 +6,7 @@ import {
   Body,
   Param,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { CreateRoomDto, UpdateRoomDto, JoinRoomDto } from './room.dto';
@@ -17,6 +18,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Room } from './room.schema';
 
 @ApiTags('room')
 @Controller('room')
@@ -29,8 +31,12 @@ export class RoomController {
   @Post()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  async createRoom(@Body() createRoomDto: CreateRoomDto) {
-    return await this.roomService.create(createRoomDto);
+  async createRoom(
+    @Body() createRoomDto: CreateRoomDto,
+    @Req() request,
+  ): Promise<Room> {
+    const ownerId = request.user.userId;
+    return await this.roomService.create({ ...createRoomDto, ownerId });
   }
 
   @ApiOperation({
