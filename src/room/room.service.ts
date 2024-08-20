@@ -60,6 +60,9 @@ export class RoomService {
     if (!room) {
       throw new NotFoundException('Room not found');
     }
+    console.log('Room ID:', id);
+    console.log('must delete User ID:', userId);
+    console.log('Room Members:', room.members);
 
     // 사용자가 방에 존재하는지 확인
     const memberIndex = room.members.findIndex((member) =>

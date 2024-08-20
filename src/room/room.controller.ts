@@ -80,11 +80,15 @@ export class RoomController {
   @Put(':id/leave')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  async leaveRoom(@Param('id') id: string, @Body('userId') userId: string) {
-    return await this.roomService.leaveRoom(
-      new Types.ObjectId(id),
-      new Types.ObjectId(userId),
-    );
+  async leaveRoom(
+    @Param('id') id: string,
+    @Body('userId') userId: string, //이렇게 전달하면 안됨
+    @Req() request, //JWT토큰에서 전달해야됨
+  ) {
+    const roomId = new Types.ObjectId(id);
+    const userObjectId = request.user.userId;
+
+    return await this.roomService.leaveRoom(roomId, userObjectId);
   }
 
   @ApiOperation({ summary: '채팅방 목록 조회' })
