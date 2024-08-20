@@ -7,9 +7,10 @@ import {
   Param,
   UseGuards,
   Req,
+  Get,
 } from '@nestjs/common';
 import { RoomService } from './room.service';
-import { CreateRoomDto, UpdateRoomDto, JoinRoomDto } from './room.dto';
+import { CreateRoomDto, UpdateRoomDto, JoinRoomDto, RoomDto } from './room.dto';
 import { Types } from 'mongoose';
 import {
   ApiTags,
@@ -84,5 +85,25 @@ export class RoomController {
       new Types.ObjectId(id),
       new Types.ObjectId(userId),
     );
+  }
+
+  @ApiOperation({ summary: '채팅방 목록 조회' })
+  @ApiResponse({
+    status: 200,
+    description: '채팅방 목록 성공',
+    type: [RoomDto],
+  })
+  @ApiResponse({ status: 404, description: '채팅방 목록을 찾을 수 없음' })
+  @Get()
+  async getAllRooms() {
+    return await this.roomService.getAllRooms();
+  }
+
+  @ApiOperation({ summary: '채팅방 이름으로 조회' })
+  @ApiResponse({ status: 200, description: '채팅방 조회 성공', type: RoomDto })
+  @ApiResponse({ status: 404, description: '채팅방을 찾을 수 없음' })
+  @Get(':roomName')
+  async getRoomByName(@Param('roomName') roomName: string) {
+    return await this.roomService.getRoomByName(roomName);
   }
 }

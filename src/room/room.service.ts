@@ -50,6 +50,7 @@ export class RoomService {
 
   async leaveRoom(id: Types.ObjectId, userId: Types.ObjectId): Promise<Room> {
     const room = await this.roomModel.findById(id).exec();
+
     if (!room) {
       throw new NotFoundException('Room not found');
     }
@@ -66,5 +67,17 @@ export class RoomService {
     room.members.splice(memberIndex, 1);
     room.memberCount = room.members.length;
     return await room.save();
+  }
+
+  async getAllRooms(): Promise<Room[]> {
+    return await this.roomModel.find().exec();
+  }
+
+  async getRoomByName(roomName: string): Promise<Room> {
+    const room = await this.roomModel.findOne({ roomName }).exec();
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
+    return room;
   }
 }
