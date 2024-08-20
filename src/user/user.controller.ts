@@ -8,6 +8,7 @@ import {
   UseGuards,
   NotFoundException,
   Param,
+  ConflictException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -71,9 +72,15 @@ export class UserController {
     @Body() changeOtherDto: ChangeOtherDto,
     @Req() request,
   ): Promise<ChangeOtherDto> {
-    const userId = request.user.userId;
-    console.log('Updating user with ID:', userId);
-    return this.userService.update(userId, changeOtherDto);
+    try {
+      const userId = request.user.userId;
+      return this.userService.update(userId, changeOtherDto);
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw new ConflictException('Username already exists');
+      }
+      throw error;
+    }
   }
 
   @ApiOperation({ summary: '탈퇴시 유저 삭제' })

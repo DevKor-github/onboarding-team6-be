@@ -86,7 +86,7 @@ export class RoomController {
     @Req() request, //JWT토큰에서 전달해야됨
   ) {
     const roomId = new Types.ObjectId(id);
-    const userObjectId = request.user.userId;
+    const userObjectId = request.user.userId; //이렇게~~><
 
     return await this.roomService.leaveRoom(roomId, userObjectId);
   }
