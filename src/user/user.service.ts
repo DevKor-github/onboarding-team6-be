@@ -18,6 +18,7 @@ import {
   Req,
   UseGuards,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 
 @Injectable()
@@ -25,8 +26,18 @@ export class UserService {
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = new this.userModel(createUserDto);
-    return await newUser.save();
+    try {
+      const newUser = new this.userModel(createUserDto);
+      return await newUser.save();
+    } catch (error) {
+      if (error.code === 11000) {
+        // Duplicate key error code가 11000인가봄
+        throw new ConflictException(
+          '중복되는 유저네임입니다. 새로운걸로 가입하셈',
+        );
+      }
+      throw error; // 중복에러 말고 딴거일때
+    }
   }
 
   //유저네임은 수정될 수 있어서
@@ -78,13 +89,21 @@ export class UserService {
     id: string,
     changeOtherDto: ChangeOtherDto,
   ): Promise<CreateUserDto> {
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, { ...changeOtherDto }, { new: true })
-      .exec();
-    if (!updatedUser) {
-      throw new NotFoundException('User not found');
+    try {
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate(id, { ...changeOtherDto }, { new: true })
+        .exec();
+      if (!updatedUser) {
+        throw new NotFoundException('User not found');
+      }
+      return this.convertToCreateUserDto(updatedUser);
+    } catch (error) {
+      if (error.code === 11000) {
+        // Duplicate key error code
+        throw new ConflictException('이미 있는 유저네임. 새로운걸로 수정하셈');
+      }
+      throw error;
     }
-    return this.convertToCreateUserDto(updatedUser);
   }
 
   async delete(id: string): Promise<CreateUserDto> {
