@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
+import { Types } from 'mongoose';
 export class CreateUserDto {
   @ApiProperty({
     description: '유저명-중복불가',
@@ -91,4 +91,25 @@ export class ChangeOtherDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+}
+export class ChatUserDto {
+  @ApiProperty({
+    description: '사용자 ID',
+    example: '123456789(유저_id)',
+  })
+  id: Types.ObjectId;
+
+  @ApiProperty({
+    description: '사용자 이름',
+    example: 'John Doe',
+  })
+  username: string;
+
+  @ApiProperty({
+    description: '프로필 사진 URL',
+    example: 'S3링크',
+  })
+  @IsOptional()
+  @IsString()
+  profilePicture?: string;
 }
