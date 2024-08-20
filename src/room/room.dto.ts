@@ -1,6 +1,7 @@
 import { IsString, IsNotEmpty, IsArray } from 'class-validator';
 import { Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import { ChatUserDto } from '../user/user.dto';
 
 export class CreateRoomDto {
   @ApiProperty({
@@ -57,14 +58,14 @@ export class RoomDto {
 
   @ApiProperty({
     description: '현재 멤버 수',
-    example: 1,
+    example: 10,
   })
   memberCount: number;
 
   @ApiProperty({
-    description: '채팅방 멤버 ID 리스트',
-    type: [String],
-    example: ['123456789', '987654321'],
+    description: '채팅방 멤버 정보 리스트',
+    type: [ChatUserDto],
+    example: ['123456789+유저네임', '987654321+유저네임'],
   })
-  members: Types.ObjectId[];
+  members: ChatUserDto[];
 }

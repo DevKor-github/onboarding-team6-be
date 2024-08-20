@@ -6,6 +6,7 @@ import {
   CreateUserDto,
   ChangePictureDto,
   ChangeOtherDto,
+  ChatUserDto,
 } from './user.dto';
 import { User } from './user.schema'; // User 타입 가져오기
 import {
@@ -40,30 +41,20 @@ export class UserService {
 
   //1. 내정보 조회
   async getUser(id: string): Promise<UserDto> {
-    console.log('Looking for user with ID:', id);
-
-    // 이 시점에서 id는 MongoDB의 _id와 동일한 문자열이어야 합니다.
-    const user = await this.userModel.findById(id).exec();
-
+    const user = await this.findById(id);
     if (!user) {
-      console.log('User not found for ID:', id);
       throw new NotFoundException('User not found');
     }
-
-    const { username, profilePicture, bio } = user.toObject();
-    return { username, profilePicture, bio } as UserDto;
+    return this.convertToUserDto(user);
   }
 
   //2. 남의 정보 유저네임으로 조회
   async getUserByUsername(username: string): Promise<UserDto> {
-    const user = await this.userModel.findOne({ username }).exec();
-
+    const user = await this.findByUsername(username);
     if (!user) {
       throw new NotFoundException(`User with username ${username} not found`);
     }
-
-    const { username: foundUsername, profilePicture, bio } = user.toObject();
-    return { username: foundUsername, profilePicture, bio } as UserDto;
+    return this.convertToUserDto(user);
   }
 
   async updatePicture(
@@ -80,7 +71,7 @@ export class UserService {
     if (!updatedUser) {
       throw new NotFoundException('User not found');
     }
-    return updatedUser.toObject() as CreateUserDto;
+    return this.convertToCreateUserDto(updatedUser);
   }
 
   async update(
@@ -93,7 +84,7 @@ export class UserService {
     if (!updatedUser) {
       throw new NotFoundException('User not found');
     }
-    return updatedUser.toObject() as CreateUserDto;
+    return this.convertToCreateUserDto(updatedUser);
   }
 
   async delete(id: string): Promise<CreateUserDto> {
@@ -101,6 +92,25 @@ export class UserService {
     if (!deletedUser) {
       throw new NotFoundException('User not found');
     }
-    return deletedUser.toObject() as CreateUserDto;
+    return this.convertToCreateUserDto(deletedUser);
+  }
+
+  private convertToUserDto(user: User): UserDto {
+    const { username, profilePicture, bio } = user.toObject();
+    return { username, profilePicture, bio };
+  }
+
+  private convertToCreateUserDto(user: User): CreateUserDto {
+    const { username, profilePicture, bio, password } = user.toObject();
+    return { username, password, profilePicture, bio };
+  }
+
+  async getChatUserDtos(ids: Types.ObjectId[]): Promise<ChatUserDto[]> {
+    const users = await this.userModel.find({ _id: { $in: ids } }).exec();
+    return users.map((user) => ({
+      id: user._id as Types.ObjectId,
+      username: user.username,
+      profilePicture: user.profilePicture,
+    }));
   }
 }

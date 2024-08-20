@@ -3,10 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Room } from './room.schema';
 import { CreateRoomDto, UpdateRoomDto, JoinRoomDto } from './room.dto';
-
+import { User } from '../user/user.schema';
+import { ChatUserDto } from '../user/user.dto';
+import { RoomDto } from './room.dto';
+import { UserService } from '../user/user.service';
 @Injectable()
 export class RoomService {
-  constructor(@InjectModel('Room') private readonly roomModel: Model<Room>) {}
+  constructor(
+    @InjectModel('Room') private readonly roomModel: Model<Room>,
+    private readonly userService: UserService,
+  ) {}
 
   async create(createRoomDto: CreateRoomDto): Promise<Room> {
     const newRoom = new this.roomModel({
@@ -69,15 +75,27 @@ export class RoomService {
     return await room.save();
   }
 
-  async getAllRooms(): Promise<Room[]> {
-    return await this.roomModel.find().exec();
+  async getAllRooms(): Promise<RoomDto[]> {
+    const rooms = await this.roomModel.find().exec();
+    return Promise.all(rooms.map((room) => this.mapToDto(room)));
   }
 
-  async getRoomByName(roomName: string): Promise<Room> {
+  async getRoomByName(roomName: string): Promise<RoomDto> {
     const room = await this.roomModel.findOne({ roomName }).exec();
     if (!room) {
       throw new NotFoundException('Room not found');
     }
-    return room;
+    return this.mapToDto(room);
+  }
+
+  private async mapToDto(room: Room): Promise<RoomDto> {
+    const memberDtos = await this.userService.getChatUserDtos(room.members);
+    return {
+      roomName: room.roomName,
+      ownerId: room.ownerId,
+      createdAt: room.createdAt,
+      memberCount: room.memberCount,
+      members: memberDtos,
+    };
   }
 }
