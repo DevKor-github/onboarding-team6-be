@@ -36,3 +36,35 @@ export class JoinRoomDto {
   @IsNotEmpty()
   userId: Types.ObjectId;
 }
+export class RoomDto {
+  @ApiProperty({
+    description: '채팅방 이름',
+    example: '품격있는 거지방 (반모)',
+  })
+  roomName: string;
+
+  @ApiProperty({
+    description: '방장 ID',
+    example: '123456789(유저_id)',
+  })
+  ownerId: Types.ObjectId;
+
+  @ApiProperty({
+    description: '채팅방 생성 날짜',
+    example: '2024-08-20T14:48:20.624Z',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    description: '현재 멤버 수',
+    example: 1,
+  })
+  memberCount: number;
+
+  @ApiProperty({
+    description: '채팅방 멤버 ID 리스트',
+    type: [String],
+    example: ['123456789', '987654321'],
+  })
+  members: Types.ObjectId[];
+}
