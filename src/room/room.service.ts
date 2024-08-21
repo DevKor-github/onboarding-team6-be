@@ -94,6 +94,7 @@ export class RoomService {
   private async mapToDto(room: Room): Promise<RoomDto> {
     const memberDtos = await this.userService.getChatUserDtos(room.members);
     return {
+      id: room.id,
       roomName: room.roomName,
       ownerId: room.ownerId,
       createdAt: room.createdAt,

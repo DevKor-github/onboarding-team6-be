@@ -91,7 +91,7 @@ export class RoomController {
     return await this.roomService.leaveRoom(roomId, userObjectId);
   }
 
-  @ApiOperation({ summary: '채팅방 목록 조회' })
+  @ApiOperation({ summary: '채팅방 전체 목록 조회' })
   @ApiResponse({
     status: 200,
     description: '채팅방 목록 성공',
