@@ -18,6 +18,10 @@ export class AddHistoryDto {
   @IsNumber()
   @IsNotEmpty()
   amount: number;
+
+  @IsString()
+  @IsNotEmpty()
+  date: string;
 }
 
 export class UpdateHistoryDto {
@@ -28,4 +32,8 @@ export class UpdateHistoryDto {
   @IsNumber()
   @IsNotEmpty()
   amount: number;
+
+  @IsString()
+  @IsOptional()
+  date?: string;
 }
