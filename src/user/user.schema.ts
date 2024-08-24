@@ -1,4 +1,4 @@
-import { Schema, Document } from 'mongoose';
+import { Schema, Types } from 'mongoose';
 
 export const UserSchema = new Schema({
   username: { type: String, required: true, unique: true },
@@ -11,6 +11,7 @@ export const UserSchema = new Schema({
 
 // TypeScript 타입 정의
 export interface User extends Document {
+  _id: Types.ObjectId;
   username: string;
   password: string;
   profilePicture?: string;
