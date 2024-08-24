@@ -9,11 +9,11 @@ export class MoneyService {s
   constructor(@InjectModel(Money.name) private moneyModel: Model<MoneyDocument>) {}
 
   async create(createMoneyDto: CreateMoneyDto): Promise<Money> {
-    const { userId } = createMoneyDto;
+    const { userId, total } = createMoneyDto;
   
     const createdMoney = new this.moneyModel({
       userId: new Types.ObjectId(userId),
-      total: 0, // 잔고 초기값 설정, 필요시 변경 가능
+      total: parseFloat(total), // 잔고 초기값 설정, 필요시 변경 가능
       history: [],
     });
   
