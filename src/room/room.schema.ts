@@ -1,4 +1,12 @@
-import { Schema } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+
+export interface Room extends Document {
+  roomName: string;
+  ownerId: Types.ObjectId;
+  createdAt: Date;
+  memberCount: number;
+  members: Types.ObjectId[];
+}
 
 export const RoomSchema = new Schema({
   roomName: { type: String, required: true },
