@@ -5,6 +5,10 @@ export class CreateMoneyDto {
   @IsNotEmpty()
   @IsString()
   userId: Types.ObjectId;
+
+  @IsString()
+  @IsNotEmpty()
+  total: string;
 }
 
 export class AddHistoryDto {
