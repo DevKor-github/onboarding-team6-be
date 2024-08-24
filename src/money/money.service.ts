@@ -5,7 +5,7 @@ import { CreateMoneyDto, AddHistoryDto, UpdateHistoryDto } from './money.dto';
 import { Money, MoneyDocument } from './money.schema';
 
 @Injectable()
-export class MoneyService {s
+export class MoneyService {
   constructor(@InjectModel(Money.name) private moneyModel: Model<MoneyDocument>) {}
 
   async create(createMoneyDto: CreateMoneyDto): Promise<Money> {
