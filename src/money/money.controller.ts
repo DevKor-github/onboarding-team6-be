@@ -38,6 +38,14 @@ export class MoneyController {
     return this.moneyService.findByUserId(new Types.ObjectId(userId));
   }
 
+  @ApiOperation({ summary: '지출/수입 내역 조회' })
+ @ApiResponse({ status: 201, description: '성공' })
+ @ApiResponse({ status: 400, description: '잘못된 요청' })
+ @Get(':userId/history')
+ async getHistory(@Param('userId') userId: string) {
+   return this.moneyService.getHistory(new Types.ObjectId(userId));
+ }
+
   @ApiOperation({ summary: '지출/수입 내역 등록' })
   @ApiResponse({ status: 201, description: '성공' })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
@@ -48,8 +56,9 @@ export class MoneyController {
         amount: { type: 'string', description: '금액' },
         memo: { type: 'string', description: '내용' },
         type: { type: 'string', enum: ['spend', 'earn'], description: '지출 또는 수입' },
-      },
-      required: ['amount', 'memo', 'type'],
+        date: { type: 'string', description: '날짜 (YYYY-MM-DD)' },
+    },
+    required: ['amount', 'memo', 'type', 'date'],
     },
   })
   @Post(':userId/history')
@@ -67,8 +76,9 @@ export class MoneyController {
       properties: {
         amount: { type: 'string', description: '금액' },
         memo: { type: 'string', description: '내용' },
-      },
-      required: ['amount', 'memo'],
+        date: { type: 'string', description: '날짜 (YYYY-MM-DD)' },
+    },
+    required: ['amount', 'memo', 'date'],
     },
   })
   @Put(':userId/history/:historyId')
