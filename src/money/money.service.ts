@@ -5,7 +5,7 @@ import { CreateMoneyDto, AddHistoryDto, UpdateHistoryDto } from './money.dto';
 import { Money, MoneyDocument } from './money.schema';
 
 @Injectable()
-export class MoneyService {
+export class MoneyService {s
   constructor(@InjectModel(Money.name) private moneyModel: Model<MoneyDocument>) {}
 
   async create(createMoneyDto: CreateMoneyDto): Promise<Money> {
@@ -28,12 +28,17 @@ export class MoneyService {
     return money;
   }
 
+  async getHistory(userId: Types.ObjectId): Promise<Money> {
+    const money: MoneyDocument = await this.findByUserId(userId);
+    return money;
+  }
+
   async addHistory(userId: Types.ObjectId, addHistoryDto: AddHistoryDto): Promise<Money> {
     const money: MoneyDocument = await this.findByUserId(userId);
     money.history.push({
       _id: new Types.ObjectId(),
       ...addHistoryDto,
-      timestamp: new Date(),
+      timestamp: new Date(addHistoryDto.date), 
     });
     if (addHistoryDto.type === 'earn') {
       money.total += addHistoryDto.amount;
@@ -54,6 +59,7 @@ export class MoneyService {
     money.total -= historyItem.amount; // 기존 금액 제거
     historyItem.amount = updateHistoryDto.amount;
     money.total += historyItem.amount; // 수정된 금액 반영
+    historyItem.timestamp = new Date(updateHistoryDto.date || historyItem.timestamp);
 
     return money.save();
   }
