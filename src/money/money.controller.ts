@@ -4,13 +4,23 @@ import { CreateMoneyDto, AddHistoryDto, UpdateHistoryDto } from './money.dto';
 import { Types } from 'mongoose';
 import { ApiBody, ApiOkResponse, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Money } from './money.schema';
+import { UserService } from '../user/user.service';
 
 @ApiTags('money')
 @Controller('money')
 export class MoneyController {
   constructor(
     private readonly moneyService: MoneyService,
+    private readonly userService: UserService,
   ) {}
+
+  private async getUserIdByUsername(username: string): Promise<Types.ObjectId> {
+    const user = await this.userService.findByUsername(username);
+    if (!user) {
+      throw new NotFoundException(`User with username ${username} not found`);
+    }
+    return user._id;
+  }
 
   @ApiOperation({ summary: '내 잔고 생성' })
   @ApiResponse({ status: 201, description: '성공' })
@@ -24,8 +34,10 @@ export class MoneyController {
       required: ['total'],
     },
   })
-  @Post()
-  async create(@Body() createMoneyDto: CreateMoneyDto): Promise<Money> { 
+  @Post(':username')
+  async create(@Param('username') username: string, @Body() createMoneyDto: CreateMoneyDto): Promise<Money> { 
+    const userId = await this.getUserIdByUsername(username);
+    createMoneyDto.userId = userId;
     return this.moneyService.create(createMoneyDto);
   }
 
@@ -33,18 +45,20 @@ export class MoneyController {
   @ApiOperation({ summary: '내 잔고 조회' })
   @ApiResponse({ status: 201, description: '성공' })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
-  @Get(':userId')
-  async getMoney(@Param('userId') userId: string) {
-    return this.moneyService.findByUserId(new Types.ObjectId(userId));
+  @Get(':username')
+  async getMoney(@Param('username') username: string) {
+    const userId = await this.getUserIdByUsername(username);
+    return this.moneyService.findByUserId(userId);
   }
 
   @ApiOperation({ summary: '지출/수입 내역 조회' })
- @ApiResponse({ status: 201, description: '성공' })
- @ApiResponse({ status: 400, description: '잘못된 요청' })
- @Get(':userId/history')
- async getHistory(@Param('userId') userId: string) {
-   return this.moneyService.getHistory(new Types.ObjectId(userId));
- }
+  @ApiResponse({ status: 201, description: '성공' })
+  @ApiResponse({ status: 400, description: '잘못된 요청' })
+  @Get(':username/history')
+  async getHistory(@Param('username') username: string) {
+    const userId = await this.getUserIdByUsername(username);
+    return this.moneyService.getHistory(userId);
+  }
 
   @ApiOperation({ summary: '지출/수입 내역 등록' })
   @ApiResponse({ status: 201, description: '성공' })
@@ -61,9 +75,10 @@ export class MoneyController {
     required: ['amount', 'memo', 'type', 'date'],
     },
   })
-  @Post(':userId/history')
-  async addHistory(@Param('userId') userId: string, @Body() addHistoryDto: AddHistoryDto) {
-    return this.moneyService.addHistory(new Types.ObjectId(userId), addHistoryDto);
+  @Post(':username/history')
+  async addHistory(@Param('username') username: string, @Body() addHistoryDto: AddHistoryDto) {
+    const userId = await this.getUserIdByUsername(username);
+    return this.moneyService.addHistory(userId, addHistoryDto);
   }
 
   ///historyId는 사용자의 지출/수입 내역 중 특정 내역을 의미함
@@ -81,16 +96,18 @@ export class MoneyController {
     required: ['amount', 'memo', 'date'],
     },
   })
-  @Put(':userId/history/:historyId')
-  async updateHistory(@Param('userId') userId: string, @Param('historyId') historyId: string, @Body() updateHistoryDto: UpdateHistoryDto) {
-    return this.moneyService.updateHistory(new Types.ObjectId(userId), new Types.ObjectId(historyId), updateHistoryDto);
+  @Put(':username/history/:historyId')
+  async updateHistory(@Param('username') username: string, @Param('historyId') historyId: string, @Body() updateHistoryDto: UpdateHistoryDto) {
+    const userId = await this.getUserIdByUsername(username);
+    return this.moneyService.updateHistory(userId, new Types.ObjectId(historyId), updateHistoryDto);
   }
 
   @ApiOperation({ summary: '지출/수입 내역 삭제 - 특정 내역 삭제' })
   @ApiResponse({ status: 201, description: '성공' })
   @ApiResponse({ status: 400, description: '잘못된 요청' })
-  @Delete(':userId/history/:historyId')
-  async deleteHistory(@Param('userId') userId: string, @Param('historyId') historyId: string) {
-    return this.moneyService.deleteHistory(new Types.ObjectId(userId), new Types.ObjectId(historyId));
+  @Delete(':username/history/:historyId')
+  async deleteHistory(@Param('username') username: string, @Param('historyId') historyId: string) {
+    const userId = await this.getUserIdByUsername(username);
+    return this.moneyService.deleteHistory(userId, new Types.ObjectId(historyId));
   }
 }
