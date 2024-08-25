@@ -55,13 +55,26 @@ export class MoneyService {s
       throw new NotFoundException('History record not found');
     }
 
-    historyItem.memo = updateHistoryDto.memo || historyItem.memo;
-    money.total -= historyItem.amount; // 기존 금액 제거
-    historyItem.amount = updateHistoryDto.amount;
-    money.total += historyItem.amount; // 수정된 금액 반영
-    historyItem.timestamp = new Date(updateHistoryDto.date || historyItem.timestamp);
+     // 기존 금액을 제거
+   money.total -= historyItem.amount;
 
-    return money.save();
+   // 기존 타입에 따른 총액 조정 (지출에서 수입으로 바꾸거나, 그 반대의 경우를 처리)
+   if (historyItem.type === 'earn' && updateHistoryDto.type === 'spend') {
+     money.total -= updateHistoryDto.amount;
+   } else if (historyItem.type === 'spend' && updateHistoryDto.type === 'earn') {
+     money.total += updateHistoryDto.amount;
+   }
+
+   // 새로운 값을 적용
+   historyItem.memo = updateHistoryDto.memo || historyItem.memo;
+   historyItem.amount = updateHistoryDto.amount;
+   historyItem.type = updateHistoryDto.type || historyItem.type;
+   historyItem.timestamp = new Date(updateHistoryDto.date || historyItem.timestamp);
+
+   // 수정된 금액 반영
+   money.total += historyItem.amount;
+
+   return money.save();
   }
 
   async deleteHistory(userId: Types.ObjectId, historyId: Types.ObjectId): Promise<Money> {
