@@ -89,11 +89,12 @@ export class MoneyController {
   @ApiBody({
     schema: {
       properties: {
+        type: { type: 'string', enum: ['spend', 'earn'], description: '지출 또는 수입' },
         amount: { type: 'string', description: '금액' },
         memo: { type: 'string', description: '내용' },
         date: { type: 'string', description: '날짜 (YYYY-MM-DD)' },
     },
-    required: ['amount', 'memo', 'date'],
+    required: ['type', 'amount', 'memo', 'date'],
     },
   })
   @Put(':username/history/:historyId')
