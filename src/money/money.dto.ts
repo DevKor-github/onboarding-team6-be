@@ -29,6 +29,24 @@ export class AddHistoryDto {
 }
 
 export class UpdateHistoryDto {
+  @IsOptional()
+  @IsEnum(['spend', 'earn'])
+  type?: 'spend' | 'earn';
+  
+  @IsString()
+  @IsOptional()
+  memo?: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
+
+  @IsString()
+  @IsOptional()
+  date?: string;
+}
+
+export class UpdateHistoryDto {
   @IsString()
   @IsOptional()
   memo?: string;
