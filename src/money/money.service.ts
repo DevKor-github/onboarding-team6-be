@@ -35,16 +35,20 @@ export class MoneyService {s
 
   async addHistory(userId: Types.ObjectId, addHistoryDto: AddHistoryDto): Promise<Money> {
     const money: MoneyDocument = await this.findByUserId(userId);
+    const amount = parseFloat(addHistoryDto.amount);
     money.history.push({
       _id: new Types.ObjectId(),
       ...addHistoryDto,
+      amount,
       timestamp: new Date(addHistoryDto.date), 
     });
+
     if (addHistoryDto.type === 'earn') {
-      money.total += addHistoryDto.amount;
+      money.total += amount;
     } else if (addHistoryDto.type === 'spend') {
-      money.total -= addHistoryDto.amount;
+      money.total -= amount;
     }
+
     return money.save();
   }
 
@@ -55,26 +59,28 @@ export class MoneyService {s
       throw new NotFoundException('History record not found');
     }
 
-     // 기존 금액을 제거
-   money.total -= historyItem.amount;
+    const amount = parseFloat(updateHistoryDto.amount);
 
-   // 기존 타입에 따른 총액 조정 (지출에서 수입으로 바꾸거나, 그 반대의 경우를 처리)
-   if (historyItem.type === 'earn' && updateHistoryDto.type === 'spend') {
-     money.total -= updateHistoryDto.amount;
-   } else if (historyItem.type === 'spend' && updateHistoryDto.type === 'earn') {
-     money.total += updateHistoryDto.amount;
-   }
+    // 기존 금액을 제거
+    money.total -= historyItem.amount;
 
-   // 새로운 값을 적용
-   historyItem.memo = updateHistoryDto.memo || historyItem.memo;
-   historyItem.amount = updateHistoryDto.amount;
-   historyItem.type = updateHistoryDto.type || historyItem.type;
-   historyItem.timestamp = new Date(updateHistoryDto.date || historyItem.timestamp);
+    // 기존 타입에 따른 총액 조정
+    if (historyItem.type === 'earn' && updateHistoryDto.type === 'spend') {
+      money.total -= amount;
+    } else if (historyItem.type === 'spend' && updateHistoryDto.type === 'earn') {
+      money.total += amount;
+    }
 
-   // 수정된 금액 반영
-   money.total += historyItem.amount;
+    // 새로운 값을 적용
+    historyItem.memo = updateHistoryDto.memo || historyItem.memo;
+    historyItem.amount = amount; // 변환된 숫자 사용
+    historyItem.type = updateHistoryDto.type || historyItem.type;
+    historyItem.timestamp = new Date(updateHistoryDto.date || historyItem.timestamp);
 
-   return money.save();
+    // 수정된 금액 반영
+    money.total += historyItem.amount;
+
+    return money.save();
   }
 
   async deleteHistory(userId: Types.ObjectId, historyId: Types.ObjectId): Promise<Money> {
