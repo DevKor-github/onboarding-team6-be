@@ -91,6 +91,28 @@ export class RoomService {
     return this.mapToDto(room);
   }
 
+  async getRoomById(id: string): Promise<RoomDto> {
+    if (!Types.ObjectId.isValid(id)) {
+      console.log(`Invalid ID format: ${id}`);
+      throw new NotFoundException('Room not found');
+    }
+
+    console.log(`Fetching room with ID: ${id}`);
+
+    const room = await this.roomModel.findOne({ _id: id }).exec();
+    if (!room) {
+      console.log(`Room with ID: ${id} not found`);
+      throw new NotFoundException('Room not found');
+    }
+    console.log(`Room with ID: ${id} found`);
+    return this.mapToDto(room);
+  }
+
+  async getRoomsByUser(userId: Types.ObjectId): Promise<RoomDto[]> {
+    const rooms = await this.roomModel.find({ members: userId }).exec();
+    return Promise.all(rooms.map((room) => this.mapToDto(room)));
+  }
+
   private async mapToDto(room: Room): Promise<RoomDto> {
     const memberDtos = await this.userService.getChatUserDtos(room.members);
     return {

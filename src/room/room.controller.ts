@@ -103,11 +103,36 @@ export class RoomController {
     return await this.roomService.getAllRooms();
   }
 
+  @ApiOperation({ summary: '채팅방 ID로 조회' })
+  @ApiResponse({ status: 200, description: '채팅방 조회 성공', type: RoomDto })
+  @ApiResponse({ status: 404, description: '채팅방을 찾을 수 없음' })
+  @Get(':id')
+  async getRoomById(@Param('id') id: string): Promise<RoomDto> {
+    console.log(`Received request to get room with ID: ${id}`);
+    return await this.roomService.getRoomById(id);
+  }
+
   @ApiOperation({ summary: '채팅방 이름으로 조회' })
   @ApiResponse({ status: 200, description: '채팅방 조회 성공', type: RoomDto })
   @ApiResponse({ status: 404, description: '채팅방을 찾을 수 없음' })
   @Get(':roomName')
   async getRoomByName(@Param('roomName') roomName: string) {
     return await this.roomService.getRoomByName(roomName);
+  }
+
+  @ApiOperation({ summary: '사용자가 참여한 채팅방 목록 조회' })
+  @ApiResponse({
+    status: 200,
+    description: '사용자가 참여한 채팅방 목록 조회 성공',
+    type: [RoomDto],
+  })
+  @ApiResponse({ status: 404, description: '채팅방을 찾을 수 없음' })
+  @Get('user-rooms')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  async getRoomsByUser(@Req() request): Promise<RoomDto[]> {
+    const userId = request.user.userId;
+    console.log(`user ID가 참여한 채팅방들: ${userId}`);
+    return await this.roomService.getRoomsByUser(userId);
   }
 }
