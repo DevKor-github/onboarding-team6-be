@@ -61,26 +61,27 @@ export class MoneyService {s
 
     const amount = parseFloat(updateHistoryDto.amount);
 
-    // 기존 금액을 제거
+    // 기존 금액과 타입에 따른 잔고 원상복구
+  if (historyItem.type === 'earn') {
     money.total -= historyItem.amount;
-
-    // 기존 타입에 따른 총액 조정
-    if (historyItem.type === 'earn' && updateHistoryDto.type === 'spend') {
-      money.total -= amount;
-    } else if (historyItem.type === 'spend' && updateHistoryDto.type === 'earn') {
-      money.total += amount;
-    }
-
-    // 새로운 값을 적용
-    historyItem.memo = updateHistoryDto.memo || historyItem.memo;
-    historyItem.amount = amount; // 변환된 숫자 사용
-    historyItem.type = updateHistoryDto.type || historyItem.type;
-    historyItem.timestamp = new Date(updateHistoryDto.date || historyItem.timestamp);
-
-    // 수정된 금액 반영
+  } else if (historyItem.type === 'spend') {
     money.total += historyItem.amount;
+  }
 
-    return money.save();
+  // 새로운 타입과 금액에 따른 잔고 조정
+  if (updateHistoryDto.type === 'earn') {
+    money.total += parseFloat(updateHistoryDto.amount);
+  } else if (updateHistoryDto.type === 'spend') {
+    money.total -= parseFloat(updateHistoryDto.amount);
+  }
+
+  // 새로운 값을 적용
+  historyItem.memo = updateHistoryDto.memo || historyItem.memo;
+  historyItem.amount = parseFloat(updateHistoryDto.amount);
+  historyItem.type = updateHistoryDto.type || historyItem.type;
+  historyItem.timestamp = new Date(updateHistoryDto.date || historyItem.timestamp);
+
+  return money.save();
   }
 
   async deleteHistory(userId: Types.ObjectId, historyId: Types.ObjectId): Promise<Money> {
@@ -96,3 +97,4 @@ export class MoneyService {s
     return money.save();
   }
 }
+
