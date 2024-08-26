@@ -39,6 +39,12 @@ export class JoinRoomDto {
 }
 export class RoomDto {
   @ApiProperty({
+    description: '방 ID',
+    example: '123456789(방_id)',
+  })
+  id: Types.ObjectId;
+
+  @ApiProperty({
     description: '채팅방 이름',
     example: '품격있는 거지방 (반모)',
   })

@@ -8,7 +8,7 @@ import { CreateMessageDto } from './chat.dto';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @ApiOperation({ summary: 'Get all messages in a chat room' })
+  @ApiOperation({ summary: 'Get all messages in a chat room - 에러있음' })
   @ApiParam({
     name: 'roomId',
     type: 'string',

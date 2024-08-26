@@ -37,9 +37,13 @@ export class ChatService {
   }
 
   async getMessages(roomId: string): Promise<any[]> {
-    const chat = await this.chatModel
-      .findOne({ roomId: new Types.ObjectId(roomId) })
-      .exec();
+    const objectId = new Types.ObjectId(roomId);
+
+    // 변환된 ObjectId를 콘솔에 출력
+    console.log(`Converted ObjectId: ${objectId}`);
+
+    // 변환된 ObjectId로 검색
+    const chat = await this.chatModel.findOne({ roomId: objectId }).exec();
 
     if (!chat) {
       throw new NotFoundException('Room not found');
