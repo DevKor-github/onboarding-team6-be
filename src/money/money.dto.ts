@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsNumberString, IsOptional } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateMoneyDto {
@@ -25,9 +19,9 @@ export class AddHistoryDto {
   @IsNotEmpty()
   memo: string;
 
-  @IsNumber()
+  @IsNumberString()
   @IsNotEmpty()
-  amount: number;
+  amount: string;
 
   @IsString()
   @IsNotEmpty()
@@ -43,9 +37,9 @@ export class UpdateHistoryDto {
   @IsOptional()
   memo?: string;
 
-  @IsNumber()
+  @IsNumberString()
   @IsNotEmpty()
-  amount: number;
+  amount: string;
 
   @IsString()
   @IsOptional()
